@@ -1,5 +1,5 @@
 #種子データ
-d <- read.csv("C:/Users/hfuis/modeling_R/data3a.csv")
+d <- read.csv("C:/Users/hfuis/StatsModeling_Kubo/data3a.csv")
 head(d,10)
 
 #列ごとに表示。
@@ -51,3 +51,18 @@ fit.id <- glm(y~x + f, data = d, family = poisson(link = "identity"))
 summary(fit.id)
 #fit後の最大対数尤度
 logLik(fit.id)
+#逸脱度
+-2*logLik(fit.id)
+
+#フルモデルでの最大対数尤度
+sum(log(dpois(d_y, lambda = d_y)))
+#最小逸脱度
+-2*sum(log(dpois(d_y, lambda = d_y)))
+
+#null model(切片だけのGLM:一般化線形モデル)
+fit.null <-glm(formula = y~1, family = poisson, data = d)
+summary(fit.null)
+#fit後の最大対数尤度
+logLik(fit.null)
+#逸脱度
+-2*logLik(fit.null)

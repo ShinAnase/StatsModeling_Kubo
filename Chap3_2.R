@@ -66,3 +66,54 @@ summary(fit.null)
 logLik(fit.null)
 #逸脱度
 -2*logLik(fit.null)
+
+
+####5章 尤度比検定 ####
+#一定モデルとxモデルの逸脱度の差
+-2*(logLik(fit.null)-logLik(fit))
+
+#一定モデルでの推定平均種子数
+exp(fit.null$coefficients) #大体mean(d$y)と変わらない
+mean(d$y)
+
+#PB法(P102)
+#一定モデル(mean(d$y)のポアソン分布)を真のモデル(帰無仮説)と仮定して
+#100個体のデータを生成
+d$y.rnd <- rpois(100, lambda = mean(d$y))
+#作ったデータに一定モデル,xモデルを当てはめる
+fit1 <- glm(y.rnd~1, data = d, family = poisson)
+fit2 <- glm(y.rnd~x, data = d, family = poisson)
+fit1$deviance-fit2$deviance #逸脱度の差
+
+#上記ステップを1000回繰り返して検定統計量(逸脱度の差)
+#の分布を作る。（ブートストラップ法）
+get.dd <- function(d) #データの生成、逸脱度の評価
+{
+  n.sample <- nrow(d) #データ数
+  y.mean <- mean(d$y) #標本平均
+  d$y.rnd <- rpois(n.sample, lambda = y.mean)
+  fit1 <- glm(y.rnd~1, data = d, family = poisson)
+  fit2 <- glm(y.rnd~x, data = d, family = poisson)
+  return(fit1$deviance-fit2$deviance) #逸脱度の差を返す
+}
+
+pb <- function(d, n.bootstrap)
+{
+  replicate(n.bootstrap, get.dd(d))
+}
+
+#パラメトリックブートストラップ法の実行
+source("/Users/hfuis/StatsModeling_Kubo/pd.R") #関数定義ファイルを読み込む
+dd12 <- pb(d, n.bootstrap = 1000)
+summary(dd12)
+#hist(dd12, breaks = seq(-0.5, 19.5, 0.1))
+hist(dd12, 100)
+abline(v = 4.5, lty=2)
+
+#標本1000個のうちいくつが観測された逸脱度の差(4.5)より大きいか
+sum(dd12>=4.5)
+41/1000
+#優位水準5%の場合の棄却限界
+quantile(dd12, 0.95)
+#⇒棄却限界が3.997なので逸脱度の差(4.5)により、帰無仮説(一定モデル)は
+#　棄却され、xモデルが採択される。

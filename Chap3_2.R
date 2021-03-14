@@ -119,7 +119,7 @@ quantile(dd12, 0.95)
 #　棄却され、xモデルが採択される。
 
 
-#カイ二乗分布をつかっら近似計算法
+#カイ二乗分布をつかった近似計算法
 fit1 <- glm(y~1, data = d, family = poisson)
 fit2 <- glm(y~x, data = d, family = poisson)
 

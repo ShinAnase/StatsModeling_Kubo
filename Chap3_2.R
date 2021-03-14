@@ -117,3 +117,12 @@ sum(dd12>=4.5)
 quantile(dd12, 0.95)
 #⇒棄却限界が3.997なので逸脱度の差(4.5)により、帰無仮説(一定モデル)は
 #　棄却され、xモデルが採択される。
+
+
+#カイ二乗分布をつかっら近似計算法
+fit1 <- glm(y~1, data = d, family = poisson)
+fit2 <- glm(y~x, data = d, family = poisson)
+
+#ANOVA
+anova(fit1, fit2, test = "Chisq")
+#カイ二乗近似はサンプル数が多いときに有効なのでこのP値はあまり信用ならない。
